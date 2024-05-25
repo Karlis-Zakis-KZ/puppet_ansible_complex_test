@@ -4,18 +4,15 @@
   gather_facts: no
   tasks:
 
-    - name: Gather facts
-      ansible.netcommon.network_facts:
-    
-    - name: Ensure ansible_net_interfaces fact is present
-      fail:
-        msg: "The ansible_net_interfaces fact is missing. Please check your network connection and ensure that the device is reachable."
-      when: ansible_net_interfaces is not defined
+    - name: Gather network facts
+      ansible.netcommon.cli_command:
+        command: show ip interface brief
+      register: interfaces_output
 
-    - name: Set Ethernet interface fact if present
+    - name: Parse Ethernet interfaces
       set_fact:
-        ethernet_interfaces: "{{ ansible_net_interfaces | selectattr('type', 'match', '^Ethernet$') | map(attribute='name') | list }}"
-    
+        ethernet_interfaces: "{{ interfaces_output.stdout_lines | select('search', '^Ethernet') | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | map(attribute=0) | list }}"
+
     - name: Debug parsed interfaces
       debug:
         var: ethernet_interfaces
