@@ -3,6 +3,57 @@
   hosts: routers
   gather_facts: yes
 
+  vars:
+    fastethernet_interfaces:
+      R1:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.11
+      R2:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.12
+      R3:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.13
+      R4:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.14
+      R5:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.15
+      R6:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.16
+      R7:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.17
+      R8:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.18
+      R9:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.19
+      R10:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.20
+      R11:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.21
+      R12:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.22
+      R13:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.23
+      R14:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.24
+      R15:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.25
+      R16:
+        - interface: FastEthernet0/0
+          ip: 192.168.21.26
+
   tasks:
     - name: Debug gathered facts
       debug:
@@ -32,57 +83,8 @@
           - ip address {{ item.ip }} 255.255.255.0
           - no shutdown
         parents: interface {{ item.interface }}
-      with_items: "{{ fastethernet_interfaces }}"
-      vars:
-        fastethernet_interfaces:
-          R1:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.11
-          R2:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.12
-          R3:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.13
-          R4:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.14
-          R5:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.15
-          R6:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.16
-          R7:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.17
-          R8:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.18
-          R9:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.19
-          R10:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.20
-          R11:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.21
-          R12:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.22
-          R13:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.23
-          R14:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.24
-          R15:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.25
-          R16:
-            - interface: FastEthernet0/0
-              ip: 192.168.21.26
+      with_items: "{{ fastethernet_interfaces[inventory_hostname] }}"
+      when: inventory_hostname in fastethernet_interfaces
 
     - name: Apply compliance template
       template:
