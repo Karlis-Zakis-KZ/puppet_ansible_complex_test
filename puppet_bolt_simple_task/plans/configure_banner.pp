@@ -10,7 +10,7 @@ plan puppet_bolt_simple_task::configure_banner(
     $motd_message = parsejson($result['stdout'])['motd_message']
 
     $targets.each |$target| {
-      out::message("Applying MOTD message to ${target.uri}: ${motd_message}")
+      out::message("Applying MOTD message to ${target.name}: ${motd_message}")
 
       $commands = [
         'configure terminal',
