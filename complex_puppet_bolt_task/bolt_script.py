@@ -55,10 +55,10 @@ def collect_interface_facts(targets):
 
         try:
             output = json.loads(result.stdout)
-            if 'results' in output:
-                facts[target] = output['results'][0]['value']['stdout']
+            if 'items' in output:
+                facts[target] = output['items'][0]['value']['stdout']
             else:
-                logging.error(f"Unexpected output format for {target}: 'results' not found")
+                logging.error(f"Unexpected output format for {target}: 'items' not found")
         except json.JSONDecodeError as e:
             logging.error(f"Failed to parse JSON output for {target}: {e}")
         except KeyError as e:
