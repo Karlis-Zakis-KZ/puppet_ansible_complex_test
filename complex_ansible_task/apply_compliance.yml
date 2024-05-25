@@ -12,16 +12,18 @@
     - name: Parse Ethernet interfaces
       set_fact:
         ethernet_interfaces: "{{ interfaces_output.stdout_lines | select('search', '^Ethernet') | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | map(attribute=0) | list }}"
+      when: interfaces_output is defined and interfaces_output.stdout_lines is defined
 
     - name: Configure Ethernet interfaces
       ansible.netcommon.cli_config:
         lines:
           - "interface {{ item }}"
           - "description Uplink to core switch"
-          - "ip address 192.168.100.{{ loop.index + 1 }} 255.255.255.0"
+          - "ip address 192.168.100.{{ 2 + item_index }} 255.255.255.0"
           - "no shutdown"
-        parents: []
       loop: "{{ ethernet_interfaces }}"
+      loop_control:
+        index_var: item_index
       ignore_errors: yes
       register: config_results
 
@@ -31,9 +33,9 @@
           - "interface {{ item }}"
           - "no description"
           - "no ip address"
-        parents: []
       loop: "{{ ethernet_interfaces }}"
       when: config_results is defined and config_results.failed
+      ignore_errors: yes
       register: revert_results
 
     - name: Apply compliance template
