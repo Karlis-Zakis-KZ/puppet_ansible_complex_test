@@ -32,11 +32,12 @@
         src: compliance_template.j2
         dest: "/tmp/{{ inventory_hostname }}_compliance.txt"
       vars:
-        ansible_facts: "{{ facts.ansible_facts }}"
+        ansible_net_interfaces: "{{ facts.ansible_net_interfaces }}"
 
     - name: Apply compliance template
       ios_config:
         src: /tmp/{{ inventory_hostname }}_compliance.txt
+      when: ansible_net_interfaces is defined and ansible_net_interfaces | length > 0
 
     - name: Backup running configuration after applying template
       ios_command:
