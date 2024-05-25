@@ -1,7 +1,11 @@
 - name: Apply Compliance Template
   hosts: routers
-  gather_facts: yes
+  gather_facts: no  # Disable the default facts gathering
   tasks:
+    - name: Gather IOS facts
+      ios_facts:
+      register: facts
+
     - name: Ensure the /tmp/backups directory exists
       file:
         path: /tmp/backups
