@@ -23,10 +23,10 @@
     - name: Configure Ethernet interface Ethernet1/0
       ansible.netcommon.cli_command:
         commands:
-          - "interface Ethernet1/0"
-          - "description Uplink to core switch"
-          - "ip address 192.168.100.1 255.255.255.0"
-          - "no shutdown"
+          - command: "interface Ethernet1/0"
+          - command: "description Uplink to core switch"
+          - command: "ip address 192.168.100.1 255.255.255.0"
+          - command: "no shutdown"
       when: "'Ethernet1/0' in ethernet_interfaces"
       ignore_errors: yes
       register: config_results
@@ -34,9 +34,9 @@
     - name: Revert Ethernet interface Ethernet1/0 settings
       ansible.netcommon.cli_command:
         commands:
-          - "interface Ethernet1/0"
-          - "no description"
-          - "no ip address"
+          - command: "interface Ethernet1/0"
+          - command: "no description"
+          - command: "no ip address"
       when: "'Ethernet1/0' in ethernet_interfaces and config_results is defined and config_results.failed"
       ignore_errors: yes
       register: revert_results
