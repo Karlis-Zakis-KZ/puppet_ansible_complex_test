@@ -1,16 +1,10 @@
 plan puppet_bolt_simple_task::configure_banner(
   TargetSpec $targets
 ) {
-  $motd_messages = [
-    "Attention! Scheduled maintenance on this device.",
-    "Warning! Unscheduled maintenance may occur on this device.",
-    "Notice: Routine check on this device today.",
-    "Reminder: This device will be updated soon."
-  ]
+  $result = run_command('/home/osboxes/puppet_ansible_complex_test/puppet_bolt_simple_task/scripts/generate_motd.py', 'localhost')
+  $motd_message = parsejson($result['stdout'])['motd_message']
 
   $targets.each |$target| {
-    $random_index = Integer.new(rand($motd_messages.size))
-    $motd_message = $motd_messages[$random_index]
     out::message("Applying MOTD message to ${target.uri}: ${motd_message}")
 
     $commands = [
