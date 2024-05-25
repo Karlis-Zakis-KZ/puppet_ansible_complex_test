@@ -19,7 +19,7 @@ def add_host_key(host, user, password):
     except Exception as e:
         logging.error(f"Failed to add host key for {host}: {e}")
 
-def run_ansible_playbook(playbook, inventory, iteration, task_name):
+def run_ansible_playbook(playbook, inventory, iteration, task_name, ip_range, wildcard_mask, acl_name):
     # Ensure the playbook exists
     if not os.path.exists(playbook):
         logging.error(f"Playbook {playbook} does not exist.")
@@ -46,7 +46,12 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
 
     logging.debug(f"Running Ansible playbook {playbook} for {task_name} iteration {iteration}")
     result = subprocess.run(
-        ["ansible-playbook", "-i", inventory, playbook],
+        [
+            "ansible-playbook", "-i", inventory, playbook,
+            "-e", f"ip_range={ip_range}",
+            "-e", f"wildcard_mask={wildcard_mask}",
+            "-e", f"acl_name={acl_name}"
+        ],
         capture_output=True,
         text=True,
         env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
@@ -90,6 +95,9 @@ if __name__ == "__main__":
     playbook = "configure_banner.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
+    ip_range = "192.168.39.0"
+    wildcard_mask = "0.0.255.255"
+    acl_name = "TEST_ACL_451"
 
     # Add host key for the router
     add_host_key("192.168.21.11", "karlis", "cisco")
@@ -98,7 +106,7 @@ if __name__ == "__main__":
     
     for i in range(1, 2):  # Run just one iteration for debugging
         logging.debug(f"Ansible Run {i}")
-        stat = run_ansible_playbook(playbook, inventory, i, task_name)
+        stat = run_ansible_playbook(playbook, inventory, i, task_name, ip_range, wildcard_mask, acl_name)
         stats.append(stat)
     
     logging.debug("Ansible Stats: %s", stats)
