@@ -1,7 +1,19 @@
 hostname {{ inventory_hostname }}
-interface GigabitEthernet0/1
+
+{% set eth_interface = None %}
+{% for iface in ansible_facts['ansible_net_interfaces'] %}
+  {% if 'Ethernet' in iface and eth_interface is none %}
+    {% set eth_interface = iface %}
+  {% endif %}
+{% endfor %}
+
+{% if eth_interface %}
+interface {{ eth_interface }}
   description Uplink to core switch
   ip address 192.168.100.1 255.255.255.0
+{% else %}
+# No applicable Ethernet interface found
+{% endif %}
 !
 line vty 0 4
   exec-timeout 10 0
