@@ -63,7 +63,7 @@
       set_fact:
         ethernet_interfaces_present: "{{ 'ansible_net_interfaces' in ansible_facts }}"
 
-    - name: Set Ethernet interface fact
+    - name: Set Ethernet interface fact if present
       set_fact:
         ethernet_interfaces: "{{ ansible_net_interfaces | dict2items | selectattr('key', 'match', '^Ethernet') | list }}"
       when: ethernet_interfaces_present
@@ -74,8 +74,8 @@
           - ip address {{ item.value.ipv4[0].address }} 255.255.255.0
           - no shutdown
         parents: interface {{ item.key }}
-      loop: "{{ ethernet_interfaces }}"
-      when: ethernet_interfaces is defined and ethernet_interfaces_present
+      loop: "{{ ethernet_interfaces | default([]) }}"
+      when: ethernet_interfaces_present
 
     - name: Configure FastEthernet interfaces
       ios_config:
