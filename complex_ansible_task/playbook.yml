@@ -1,0 +1,38 @@
+---
+- name: Configure Ethernet1/0 if present, exclude FastEthernet ports
+  hosts: routers
+  gather_facts: no
+  tasks:
+    - name: Collect interface facts
+      ios_facts:
+        gather_subset: interfaces
+      register: facts
+
+    - name: Check if Ethernet1/0 is present
+      set_fact:
+        eth1_0_present: "{{ 'Ethernet1/0' in facts.ansible_facts.ansible_net_interfaces }}"
+
+    - name: Debug - Ethernet1/0 presence
+      debug:
+        msg: "Ethernet1/0 is present: {{ eth1_0_present }}"
+
+    - name: Assign unique IP to Ethernet1/0
+      set_fact:
+        eth1_0_ip: "192.168.100.{{ play_hosts.index(inventory_hostname) + 1 }}"
+
+    - name: Configure Ethernet1/0 if present
+      ios_config:
+        lines:
+          - description Configured by Ansible
+          - ip address {{ eth1_0_ip }} 255.255.255.0
+          - no shutdown
+        parents: interface Ethernet1/0
+      when: eth1_0_present
+
+    - name: Ensure no configuration on FastEthernet ports
+      ios_config:
+        lines:
+          - description Not configured by Ansible
+        parents: "{{ item }}"
+      with_items: "{{ facts.ansible_facts.ansible_net_interfaces | select('match', '^FastEthernet') | list }}"
+      when: item in facts.ansible_facts.ansible_net_interfaces

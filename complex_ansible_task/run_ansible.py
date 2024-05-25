@@ -8,25 +8,16 @@ import paramiko
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def add_host_key(host):
-    """Add host key to known_hosts using ssh-keyscan."""
+def add_host_key(host, user, password):
+    """Add host key to known_hosts using paramiko."""
     try:
-        result = subprocess.run(
-            ["ssh-keyscan", "-H", host],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        if result.stdout:
-            with open(os.path.expanduser("~/.ssh/known_hosts"), "a") as known_hosts:
-                known_hosts.write(result.stdout)
-            logging.debug(f"Successfully added host key for {host}")
-        else:
-            logging.error(f"No host key found for {host}")
-    except subprocess.CalledProcessError as e:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(host, username=user, password=password)
+        client.close()
+        logging.debug(f"Successfully added host key for {host}")
+    except Exception as e:
         logging.error(f"Failed to add host key for {host}: {e}")
-        logging.error(f"stdout: {e.stdout}")
-        logging.error(f"stderr: {e.stderr}")
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
     # Ensure the playbook exists
@@ -96,17 +87,17 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    playbook = "collect_facts.yml"
+    playbook = "playbook.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
 
     # Add host keys for all routers
-    for i in range(11, 27):
-        add_host_key(f"192.168.21.{i}")
+    for i in range(12, 27):
+        add_host_key(f"192.168.21.{i}", "karlis", "cisco")
     
     stats = []
     
-    for i in range(1, 2):  # Run iterations for debugging
+    for i in range(1, 11):  # Run just one iteration for debugging
         logging.debug(f"Ansible Run {i}")
         stat = run_ansible_playbook(playbook, inventory, i, task_name)
         stats.append(stat)
