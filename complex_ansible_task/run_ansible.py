@@ -87,7 +87,7 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    playbook = "configure_banner.yml"
+    playbook = "apply_compliance.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
 
