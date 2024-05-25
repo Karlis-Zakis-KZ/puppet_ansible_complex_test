@@ -3,7 +3,7 @@
   gather_facts: no
   tasks:
     - name: Set banner
-      ios_config:
+      cisco.ios.ios_config:
         lines:
           - banner login ^C
           - Welcome to the router! Unauthorized access is prohibited.^C
