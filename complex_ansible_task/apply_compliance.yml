@@ -12,18 +12,17 @@
 
     - name: Parse interface facts
       set_fact:
-        ansible_net_interfaces: "{{ ansible_net_interfaces | default({}) | combine({ item[0]: item[1:] }) }}"
-      loop: "{{ interfaces_output.stdout_lines | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | list }}"
+        ethernet_interfaces: "{{ interfaces_output.stdout_lines | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | map(attribute=0) | list }}"
 
-    - name: Set Ethernet interface fact if present
-      set_fact:
-        ethernet_interfaces: "{{ ansible_net_interfaces.keys() | list }}"
+    - name: Debug parsed interfaces
+      debug:
+        var: ethernet_interfaces
 
     - name: Configure Ethernet interfaces
       ios_config:
         lines:
           - description Uplink to core switch
-          - ip address 192.168.100.1 255.255.255.0
+          - ip address 192.168.100.{{ ansible_loop.index }} 255.255.255.0
           - no shutdown
         parents: "interface {{ item }}"
       loop: "{{ ethernet_interfaces }}"
