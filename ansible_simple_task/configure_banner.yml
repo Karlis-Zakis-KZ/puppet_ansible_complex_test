@@ -1,16 +1,18 @@
 - name: Apply configuration change to routers
   hosts: routers
   gather_facts: no
+  vars:
+    motd_messages:
+      - Attention! Scheduled maintenance on {{ inventory_hostname }}.
+      - Warning! Unscheduled maintenance may occur on {{ inventory_hostname }}.
+      - Notice: Routine check on {{ inventory_hostname }} today.
+      - Reminder: {{ inventory_hostname }} will be updated soon.
   tasks:
-    - name: Generate random MOTD message
-      set_fact:
-        motd_message: "{{ lookup('random', 'Attention! Scheduled maintenance on {{ inventory_hostname }}.').split(',')[0] }}"
-
     - name: Set MOTD banner
       ios_command:
         commands:
           - configure terminal
-          - "banner motd $ {{ motd_message }} $"
+          - "banner motd $ {{ motd_messages | random }} $"
           - end
       vars:
         ansible_command_timeout: 120
