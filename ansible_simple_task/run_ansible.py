@@ -48,7 +48,8 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     result = subprocess.run(
         ["ansible-playbook", "-i", inventory, playbook],
         capture_output=True,
-        text=True
+        text=True,
+        env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
     )
 
     end_time = time.time()
