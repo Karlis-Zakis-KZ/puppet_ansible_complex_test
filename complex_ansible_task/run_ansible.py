@@ -57,7 +57,7 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
 
 if __name__ == "__main__":
     apply_playbook = "apply_compliance.yml"
-    inventory = "inventory.ini"
+    inventory = "hosts.ini"
 
     stats = []
 
