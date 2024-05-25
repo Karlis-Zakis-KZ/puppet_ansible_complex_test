@@ -10,17 +10,11 @@ plan puppet_bolt_simple_task::configure_banner(
     $motd_message = parsejson($result['stdout'])['motd_message']
 
     $targets.each |$target| {
-      out::message("Applying MOTD message to ${target.uri}: ${motd_message}")
+      # Print the target object
+      out::message("Target object: ${target}")
 
-      $commands = [
-        'configure terminal',
-        "banner motd $ ${motd_message} $",
-        'end'
-      ]
-
-      $commands.each |$command| {
-        run_command($command, $target, '_run_as' => 'karlis', 'password' => 'cisco')
-      }
+      # Placeholder for the actual commands
+      out::message("Applying MOTD message to target: ${motd_message}")
     }
   } else {
     out::message("Failed to generate MOTD message. Command failed on localhost.")
