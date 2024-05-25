@@ -31,6 +31,7 @@ plan puppet_bolt_simple_task::configure_banner(
         'end'
       ]
 
+      # Run commands on the target
       $commands.each |$command| {
         run_command($command, $target, '_run_as' => 'karlis', 'password' => 'cisco')
       }

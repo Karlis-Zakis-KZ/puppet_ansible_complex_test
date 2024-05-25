@@ -8,6 +8,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.12
     name: R2
     config:
@@ -16,6 +22,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.13
     name: R3
     config:
@@ -24,6 +36,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.14
     name: R4
     config:
@@ -32,6 +50,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.15
     name: R5
     config:
@@ -40,6 +64,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.16
     name: R6
     config:
@@ -48,6 +78,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.17
     name: R7
     config:
@@ -56,6 +92,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.18
     name: R8
     config:
@@ -64,6 +106,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.19
     name: R9
     config:
@@ -72,6 +120,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.20
     name: R10
     config:
@@ -80,6 +134,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.21
     name: R11
     config:
@@ -88,6 +148,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.22
     name: R12
     config:
@@ -96,6 +162,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.23
     name: R13
     config:
@@ -104,6 +176,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.24
     name: R14
     config:
@@ -112,6 +190,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.25
     name: R15
     config:
@@ -120,6 +204,12 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
   - uri: 192.168.21.26
     name: R16
     config:
@@ -128,4 +218,9 @@ targets:
         user: karlis
         password: cisco
         host-key-check: false
-
+        encryption-algorithms:
+          - defaults
+          - aes128-cbc
+          - 3des-cbc
+          - aes192-cbc
+          - aes256-cbc
