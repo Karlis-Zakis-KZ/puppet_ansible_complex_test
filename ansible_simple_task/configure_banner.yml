@@ -2,10 +2,14 @@
   hosts: routers
   gather_facts: no
   tasks:
-    - name: Set login banner
+    - name: Set MOTD banner
       ios_command:
         commands:
           - configure terminal
-          - banner login ^C
-          - Welcome to the router! Unauthorized access is prohibited.^C
+          - banner motd $
+          - Attention!
+          - We will be having scheduled system maintenance on this device.
+          - $
           - end
+      vars:
+        ansible_command_timeout: 120
