@@ -14,11 +14,14 @@ def add_host_key(host, user, password):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(host, username=user, password=password)
-        client.save_host_keys(os.path.expanduser('~/.ssh/known_hosts'))
         client.close()
         logging.debug(f"Successfully added host key for {host}")
     except Exception as e:
         logging.error(f"Failed to add host key for {host}: {e}")
+
+def add_keys_to_known_hosts():
+    for i in range(11, 27):
+        add_host_key(f"192.168.21.{i}", "karlis", "cisco")
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
     # Ensure the playbook exists
@@ -93,8 +96,7 @@ if __name__ == "__main__":
     task_name = "ansible"
 
     # Add host keys for all routers
-    for i in range(11, 27):
-        add_host_key(f"192.168.21.{i}", "karlis", "cisco")
+    add_keys_to_known_hosts()
     
     stats = []
     
