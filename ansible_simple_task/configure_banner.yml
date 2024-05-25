@@ -1,15 +1,15 @@
 - name: Configure banner on routers
   hosts: routers
   gather_facts: no
+  vars:
+    ansible_network_os: ios
+    ansible_user: karlis
+    ansible_password: cisco
+    ansible_connection: network_cli
+    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
   tasks:
     - name: Set banner
       ios_config:
         lines:
           - banner login ^C
           - Welcome to the router! Unauthorized access is prohibited.^C
-      vars:
-        ansible_network_os: ios
-        ansible_user: karlis
-        ansible_password: cisco
-        ansible_connection: network_cli
-        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
