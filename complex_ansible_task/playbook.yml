@@ -33,6 +33,6 @@
       ios_config:
         lines:
           - description Not configured by Ansible
-        parents: "{{ item }}"
+        parents: "{{ 'interface ' + item }}"
       with_items: "{{ facts.ansible_facts.ansible_net_interfaces | select('match', '^FastEthernet') | list }}"
       when: item in facts.ansible_facts.ansible_net_interfaces
