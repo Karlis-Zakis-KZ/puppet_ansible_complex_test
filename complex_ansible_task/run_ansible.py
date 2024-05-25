@@ -97,7 +97,7 @@ if __name__ == "__main__":
     
     stats = []
     
-    for i in range(1, 11):  # Run just one iteration for debugging
+    for i in range(1, 11):
         logging.debug(f"Ansible Run {i}")
         stat = run_ansible_playbook(playbook, inventory, i, task_name)
         stats.append(stat)
