@@ -1,10 +1,11 @@
 ---
 - name: Collect facts from all devices and store as backup
   hosts: all
-  gather_facts: yes
+  gather_facts: no
   tasks:
     - name: Gather network facts
-      ansible.builtin.setup:
+      ansible.legacy.ios_facts:
+        gather_subset: all
 
     - name: Store facts to a file
       ansible.builtin.copy:

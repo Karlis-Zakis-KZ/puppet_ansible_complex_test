@@ -109,7 +109,7 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    playbook = "collect_facts_with_key.yml"
+    playbook = "collect_facts.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
 
