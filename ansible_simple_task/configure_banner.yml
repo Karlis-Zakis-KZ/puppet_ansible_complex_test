@@ -5,6 +5,5 @@
     - name: Set login banner
       cisco.ios.ios_config:
         lines:
-          - banner login ^C
-          - Welcome to the router! Unauthorized access is prohibited.^C
-          - ^C
+          - Welcome to the router! Unauthorized access is prohibited.
+        parents: banner login
