@@ -1,7 +1,7 @@
 hostname {{ inventory_hostname }}
 
 {% set eth_interface = None %}
-{% for iface in ansible_facts['ansible_net_interfaces'] %}
+{% for iface in ansible_facts['ansible_interfaces'] %}
   {% if 'Ethernet' in iface and eth_interface is none %}
     {% set eth_interface = iface %}
   {% endif %}
