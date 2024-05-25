@@ -2,92 +2,30 @@
 - name: Apply compliance
   hosts: routers
   gather_facts: yes
-
-  vars:
-    fastethernet_interfaces:
-      R1:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.11
-      R2:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.12
-      R3:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.13
-      R4:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.14
-      R5:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.15
-      R6:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.16
-      R7:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.17
-      R8:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.18
-      R9:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.19
-      R10:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.20
-      R11:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.21
-      R12:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.22
-      R13:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.23
-      R14:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.24
-      R15:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.25
-      R16:
-        - interface: FastEthernet0/0
-          ip: 192.168.21.26
+  connection: network_cli
 
   tasks:
-    - name: Debug gathered facts
-      debug:
-        var: ansible_facts
-
     - name: Ensure ansible_net_interfaces fact is present
-      set_fact:
-        ethernet_interfaces_present: "{{ 'ansible_net_interfaces' in ansible_facts }}"
+      ansible.netcommon.network_facts:
+        gather_subset: interfaces
 
     - name: Set Ethernet interface fact if present
       set_fact:
-        ethernet_interfaces: "{{ ansible_net_interfaces | dict2items | selectattr('key', 'match', '^Ethernet') | list }}"
-      when: ethernet_interfaces_present
+        ethernet_interfaces: "{{ ansible_net_interfaces.keys() | select('match', '^Ethernet[0-9]') | list }}"
+      when: ansible_net_interfaces is defined
 
     - name: Configure Ethernet interfaces
       ios_config:
         lines:
-          - ip address {{ item.value.ipv4[0].address }} 255.255.255.0
+          - description Uplink to core switch
+          - ip address 192.168.100.1 255.255.255.0
           - no shutdown
-        parents: interface {{ item.key }}
-      loop: "{{ ethernet_interfaces | default([]) }}"
-      when: ethernet_interfaces_present
-
-    - name: Configure FastEthernet interfaces
-      ios_config:
-        lines:
-          - ip address {{ item.ip }} 255.255.255.0
-          - no shutdown
-        parents: interface {{ item.interface }}
-      with_items: "{{ fastethernet_interfaces[inventory_hostname] }}"
-      when: inventory_hostname in fastethernet_interfaces
+        parents: "interface {{ item }}"
+      loop: "{{ ethernet_interfaces }}"
+      when: ethernet_interfaces | length > 0
 
     - name: Apply compliance template
       template:
         src: compliance_template.j2
         dest: /etc/network/configs/compliance.conf
-      when: ethernet_interfaces is defined or (inventory_hostname in fastethernet_interfaces)
+      when: ethernet_interfaces | length > 0
