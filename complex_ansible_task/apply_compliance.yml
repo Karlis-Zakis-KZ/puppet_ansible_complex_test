@@ -13,6 +13,12 @@
       set_fact:
         ethernet_interfaces: "{{ interfaces_output.stdout_lines | select('search', '^Ethernet1/0') | list }}"
       when: interfaces_output is defined and interfaces_output.stdout_lines is defined
+      ignore_errors: yes
+
+    - name: Ensure Ethernet1/0 exists
+      set_fact:
+        ethernet_interfaces: ["Ethernet1/0"]
+      when: ethernet_interfaces is not defined or ethernet_interfaces | length == 0
 
     - name: Configure Ethernet interface Ethernet1/0
       ansible.netcommon.cli_command:
