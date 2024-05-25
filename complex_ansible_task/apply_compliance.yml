@@ -13,10 +13,6 @@
       set_fact:
         ethernet_interfaces: "{{ interfaces_output.stdout_lines | select('search', '^Ethernet') | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | map(attribute=0) | list }}"
 
-    - name: Debug parsed interfaces
-      debug:
-        var: ethernet_interfaces
-
     - name: Configure Ethernet interfaces
       ansible.netcommon.cli_config:
         lines:
@@ -29,10 +25,6 @@
       ignore_errors: yes
       register: config_results
 
-    - name: Collect data on configuration attempt
-      debug:
-        var: config_results
-
     - name: Revert Ethernet interface settings
       ansible.netcommon.cli_config:
         lines:
@@ -43,10 +35,6 @@
       loop: "{{ ethernet_interfaces }}"
       when: config_results is defined and config_results.failed
       register: revert_results
-
-    - name: Collect data on revert attempt
-      debug:
-        var: revert_results
 
     - name: Apply compliance template
       ansible.builtin.template:
@@ -59,6 +47,18 @@
         command: show running-config
       register: running_config
 
-    - name: Display the final running configuration
+    - name: Extract relevant network details
+      set_fact:
+        network_details: |
+          Configured Interfaces:
+          {{ config_results.results | map(attribute='item') | join(', ') }}
+
+          Reverted Interfaces:
+          {{ revert_results.results | map(attribute='item') | join(', ') }}
+
+          Final Running Config:
+          {{ running_config.stdout }}
+
+    - name: Display relevant network details
       debug:
-        var: running_config.stdout
+        var: network_details
