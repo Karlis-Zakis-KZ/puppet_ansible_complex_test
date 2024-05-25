@@ -1,14 +1,12 @@
 import subprocess
 import time
-from scapy.all import sniff, wrpcap, AsyncSniffer
+from scapy.all import AsyncSniffer, wrpcap
 import os
 import logging
 
-# Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
-    # Ensure the playbook exists
     if not os.path.exists(playbook):
         logging.error(f"Playbook {playbook} does not exist.")
         return {
@@ -25,24 +23,20 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
             "error": f"Playbook {playbook} does not exist."
         }
 
-    # Start packet sniffing
     logging.debug(f"Starting packet sniffing for {task_name} iteration {iteration}")
     sniffer = AsyncSniffer()
     sniffer.start()
 
     start_time = time.time()
-
     logging.debug(f"Running Ansible playbook {playbook} for {task_name} iteration {iteration}")
     result = subprocess.run(
         ["ansible-playbook", "-i", inventory, playbook],
         capture_output=True,
         text=True
     )
-
     end_time = time.time()
     duration = end_time - start_time
 
-    # Stop packet sniffing
     packets = sniffer.stop()
     pcap_file = f"{task_name}_packets_{iteration}.pcap"
     wrpcap(pcap_file, packets)
@@ -75,14 +69,14 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
 
 if __name__ == "__main__":
     playbook = "network_backup_compliance.yml"
-    inventory = "inventory.ini"
+    inventory = "hosts.ini"
 
-    backup_stats = []
+    stats = []
 
-    for i in range(1, 11):  # Run a few iterations to test
+    for i in range(1, 11):  # Run multiple iterations to test
         logging.debug(f"Ansible Run {i}")
-        backup_stat = run_ansible_playbook(playbook, inventory, i, "ansible")
-        backup_stats.append(backup_stat)
+        stat = run_ansible_playbook(playbook, inventory, i, "ansible")
+        stats.append(stat)
 
-    logging.debug("Backup Stats: %s", backup_stats)
-    print("Backup Stats:", backup_stats)
+    logging.debug("Ansible Stats: %s", stats)
+    print("Ansible Stats:", stats)
