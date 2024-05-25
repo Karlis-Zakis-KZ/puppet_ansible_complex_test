@@ -15,8 +15,8 @@
       when: interfaces_output is defined and interfaces_output.stdout_lines is defined
 
     - name: Configure Ethernet interfaces
-      ansible.netcommon.cli_config:
-        lines:
+      ansible.netcommon.cli_command:
+        commands:
           - "interface {{ item }}"
           - "description Uplink to core switch"
           - "ip address 192.168.100.{{ 2 + item_index }} 255.255.255.0"
@@ -28,8 +28,8 @@
       register: config_results
 
     - name: Revert Ethernet interface settings
-      ansible.netcommon.cli_config:
-        lines:
+      ansible.netcommon.cli_command:
+        commands:
           - "interface {{ item }}"
           - "no description"
           - "no ip address"
