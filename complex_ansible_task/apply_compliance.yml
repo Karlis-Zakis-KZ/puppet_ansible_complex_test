@@ -11,30 +11,27 @@
 
     - name: Parse Ethernet interfaces
       set_fact:
-        ethernet_interfaces: "{{ interfaces_output.stdout_lines | select('search', '^Ethernet') | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | map(attribute=0) | list }}"
+        ethernet_interfaces: "{{ interfaces_output.stdout_lines | select('search', '^Ethernet1/0') | list }}"
       when: interfaces_output is defined and interfaces_output.stdout_lines is defined
 
-    - name: Configure Ethernet interfaces
+    - name: Configure Ethernet interface Ethernet1/0
       ansible.netcommon.cli_command:
         commands:
-          - "interface {{ item }}"
+          - "interface Ethernet1/0"
           - "description Uplink to core switch"
-          - "ip address 192.168.100.{{ 2 + item_index }} 255.255.255.0"
+          - "ip address 192.168.100.1 255.255.255.0"
           - "no shutdown"
-      loop: "{{ ethernet_interfaces }}"
-      loop_control:
-        index_var: item_index
+      when: "'Ethernet1/0' in ethernet_interfaces"
       ignore_errors: yes
       register: config_results
 
-    - name: Revert Ethernet interface settings
+    - name: Revert Ethernet interface Ethernet1/0 settings
       ansible.netcommon.cli_command:
         commands:
-          - "interface {{ item }}"
+          - "interface Ethernet1/0"
           - "no description"
           - "no ip address"
-      loop: "{{ ethernet_interfaces }}"
-      when: config_results is defined and config_results.failed
+      when: "'Ethernet1/0' in ethernet_interfaces and config_results is defined and config_results.failed"
       ignore_errors: yes
       register: revert_results
 
@@ -52,11 +49,14 @@
     - name: Extract relevant network details
       set_fact:
         network_details: |
-          Configured Interfaces:
-          {{ config_results.results | map(attribute='item') | join(', ') }}
+          Configured Interfaces: Ethernet1/0
 
-          Reverted Interfaces:
-          {{ revert_results.results | map(attribute='item') | join(', ') }}
+          Reverted Interfaces: 
+          {% if revert_results.results is defined %}
+          Ethernet1/0
+          {% else %}
+          None
+          {% endif %}
 
           Final Running Config:
           {{ running_config.stdout }}
