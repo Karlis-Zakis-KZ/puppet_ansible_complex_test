@@ -3,9 +3,21 @@ import time
 from scapy.all import sniff, wrpcap, AsyncSniffer
 import os
 import logging
+import paramiko
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def add_host_key(host, user, password):
+    """Add host key to known_hosts using paramiko."""
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(host, username=user, password=password)
+        client.close()
+        logging.debug(f"Successfully added host key for {host}")
+    except Exception as e:
+        logging.error(f"Failed to add host key for {host}: {e}")
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
     # Ensure the playbook exists
@@ -77,6 +89,9 @@ if __name__ == "__main__":
     playbook = "configure_banner.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
+
+    # Add host key for the router
+    add_host_key("192.168.21.11", "karlis", "cisco")
     
     stats = []
     
