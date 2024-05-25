@@ -9,11 +9,12 @@ import paramiko
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def add_host_key(host, user, password):
-    """Add host key to known_hosts using paramiko."""
+    """Add host key to known_hosts using paramiko with a timeout."""
     try:
+        logging.debug(f"Connecting to {host} to add host key.")
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(host, username=user, password=password)
+        client.connect(host, username=user, password=password, timeout=10)
         client.close()
         logging.debug(f"Successfully added host key for {host}")
     except Exception as e:
@@ -95,6 +96,7 @@ if __name__ == "__main__":
     inventory = "hosts.ini"
     task_name = "ansible"
 
+    logging.debug("Adding host keys to known_hosts")
     # Add host keys for all routers
     add_keys_to_known_hosts()
     
