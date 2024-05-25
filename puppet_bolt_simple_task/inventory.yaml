@@ -1,0 +1,130 @@
+version: 2
+targets:
+  - uri: 192.168.21.11
+    name: R1
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.12
+    name: R2
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.13
+    name: R3
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.14
+    name: R4
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.15
+    name: R5
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.16
+    name: R6
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.17
+    name: R7
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.18
+    name: R8
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.19
+    name: R9
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.20
+    name: R10
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.21
+    name: R11
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.22
+    name: R12
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.23
+    name: R13
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.24
+    name: R14
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.25
+    name: R15
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
+  - uri: 192.168.21.26
+    name: R16
+    config:
+      transport: ssh
+      ssh:
+        user: karlis
+        password: cisco
+        host-key-check: false
