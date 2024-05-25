@@ -8,8 +8,11 @@ plan puppet_bolt_simple_task::configure_banner(
     "Reminder: This device will be updated soon."
   ]
 
+  $random_index = Deferred('stdlib::rand', [$motd_messages.size])
+
   $targets.each |$target| {
-    $motd_message = $motd_messages.get(random($motd_messages.size))
+    $motd_message = $motd_messages[$random_index]
+
     out::message("Applying MOTD message to ${target.uri}: ${motd_message}")
 
     $commands = [
