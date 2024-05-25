@@ -1,6 +1,9 @@
 plan puppet_bolt_simple_task::configure_banner(
   TargetSpec $targets
 ) {
+  # Print the inventory for debugging
+  out::message("Inventory: ${get_targets($targets)}")
+
   # Run the command and get the result
   $result_set = run_command('/home/osboxes/puppet_ansible_complex_test/puppet_bolt_simple_task/scripts/generate_motd.py', 'localhost')
   
