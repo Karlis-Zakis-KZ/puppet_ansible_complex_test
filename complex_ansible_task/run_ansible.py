@@ -50,12 +50,29 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     start_time = time.time()
 
     logging.debug(f"Running Ansible playbook {playbook} for {task_name} iteration {iteration}")
-    result = subprocess.run(
-        ["ansible-playbook", "-i", inventory, playbook],
-        capture_output=True,
-        text=True,
-        env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
-    )
+    try:
+        result = subprocess.run(
+            ["ansible-playbook", "-i", inventory, playbook],
+            capture_output=True,
+            text=True,
+            timeout=600,  # Timeout set to 10 minutes
+            env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
+        )
+    except subprocess.TimeoutExpired:
+        logging.error(f"Ansible playbook {playbook} timed out after 10 minutes.")
+        return {
+            "run": iteration,
+            "task": task_name,
+            "duration": 600,
+            "num_packets": 0,
+            "file_size": 0,
+            "data_size": 0,
+            "data_byte_rate": 0,
+            "data_bit_rate": 0,
+            "avg_packet_size": 0,
+            "avg_packet_rate": 0,
+            "error": f"Playbook {playbook} timed out after 10 minutes."
+        }
 
     end_time = time.time()
     duration = end_time - start_time
@@ -92,12 +109,11 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    playbook = "apply_compliance.yml"
+    playbook = "collect_facts.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
 
     logging.debug("Adding host keys to known_hosts")
-    # Add host keys for all routers
     add_keys_to_known_hosts()
     
     stats = []

@@ -1,0 +1,12 @@
+---
+- name: Collect facts from all devices and store as backup
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: Gather network facts
+      ansible.builtin.setup:
+
+    - name: Store facts to a file
+      ansible.builtin.copy:
+        content: "{{ ansible_facts | to_nice_json }}"
+        dest: "/backups/{{ inventory_hostname }}_facts.json"
