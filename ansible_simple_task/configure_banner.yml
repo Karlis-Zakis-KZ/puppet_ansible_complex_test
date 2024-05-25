@@ -7,7 +7,9 @@
         lines:
           - banner login ^C
           - Welcome to the router! Unauthorized access is prohibited.^C
-        provider:
-          username: "{{ ansible_user }}"
-          password: "{{ ansible_password }}"
-          host: "{{ ansible_host }}"
+      vars:
+        ansible_network_os: ios
+        ansible_user: karlis
+        ansible_password: cisco
+        ansible_connection: network_cli
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
