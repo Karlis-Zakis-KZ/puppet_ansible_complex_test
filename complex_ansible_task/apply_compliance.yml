@@ -6,7 +6,7 @@
       ios_facts:
         gather_subset:
           - interfaces
-      register: facts
+      register: ios_facts
 
     - name: Ensure the /tmp/backups directory exists
       file:
@@ -31,16 +31,16 @@
 
     - name: Debug gathered facts
       debug:
-        var: facts
+        var: ios_facts
 
-    - name: Set Ethernet interface fact
+    - name: Check if ansible_net_interfaces exists
       set_fact:
-        ethernet_interfaces: "{{ facts.ansible_net_interfaces | select('search', 'Ethernet') | list }}"
+        ethernet_interfaces: "{{ ios_facts.ansible_facts.ansible_net_interfaces | select('search', 'Ethernet') | list }}"
+      when: ios_facts.ansible_facts.ansible_net_interfaces is defined
 
     - name: Debug ethernet interfaces
       debug:
-        msg: "Ethernet interfaces found: {{ ethernet_interfaces }}"
-      when: ethernet_interfaces | length > 0
+        msg: "Ethernet interfaces found: {{ ethernet_interfaces | default('No Ethernet interfaces found') }}"
 
     - name: Load compliance template
       template:
