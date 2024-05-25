@@ -1,74 +1,90 @@
-- name: Apply Compliance Template
+---
+- name: Apply compliance
   hosts: routers
-  gather_facts: no
+  gather_facts: yes
+
   tasks:
-    - name: Gather IOS facts
-      ios_facts:
-        gather_subset:
-          - interfaces
-      register: ios_facts
-
-    - name: Ensure the /tmp/backups directory exists
-      file:
-        path: /tmp/backups
-        state: directory
-        mode: '0755'
-
-    - name: Set timestamp for file names
-      set_fact:
-        timestamp: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
-
-    - name: Backup running configuration
-      ios_command:
-        commands:
-          - show running-config
-      register: running_config
-
-    - name: Save running config to file
-      copy:
-        content: "{{ running_config.stdout[0] }}"
-        dest: "/tmp/backups/{{ inventory_hostname }}_running_config_{{ timestamp }}.txt"
-
     - name: Debug gathered facts
       debug:
-        var: ios_facts
+        var: ansible_facts
 
-    - name: Check if ansible_net_interfaces exists
+    - name: Ensure ansible_net_interfaces fact is present
       set_fact:
-        ethernet_interfaces: "{{ ios_facts.ansible_facts.ansible_net_interfaces | select('search', 'Ethernet') | list }}"
-      when: ios_facts.ansible_facts.ansible_net_interfaces is defined
+        ethernet_interfaces_present: "{{ 'ansible_net_interfaces' in ansible_facts }}"
 
-    - name: Debug ethernet interfaces
-      debug:
-        msg: "Ethernet interfaces found: {{ ethernet_interfaces | default('No Ethernet interfaces found') }}"
+    - name: Set Ethernet interface fact
+      set_fact:
+        ethernet_interfaces: "{{ ansible_net_interfaces | dict2items | selectattr('key', 'match', '^Ethernet') | list }}"
+      when: ethernet_interfaces_present
 
-    - name: Load compliance template
-      template:
-        src: compliance_template.j2
-        dest: "/tmp/{{ inventory_hostname }}_compliance.txt"
-      when: ethernet_interfaces | length > 0
+    - name: Configure Ethernet interfaces
+      ios_config:
+        lines:
+          - ip address {{ item.value.ipv4[0].address }} 255.255.255.0
+          - no shutdown
+        parents: interface {{ item.key }}
+      loop: "{{ ethernet_interfaces }}"
+      when: ethernet_interfaces_present
+
+    - name: Configure FastEthernet interfaces
+      ios_config:
+        lines:
+          - ip address {{ item.ip }} 255.255.255.0
+          - no shutdown
+        parents: interface {{ item.interface }}
+      with_items: "{{ fastethernet_interfaces }}"
+      vars:
+        fastethernet_interfaces:
+          R1:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.11
+          R2:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.12
+          R3:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.13
+          R4:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.14
+          R5:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.15
+          R6:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.16
+          R7:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.17
+          R8:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.18
+          R9:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.19
+          R10:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.20
+          R11:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.21
+          R12:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.22
+          R13:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.23
+          R14:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.24
+          R15:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.25
+          R16:
+            - interface: FastEthernet0/0
+              ip: 192.168.21.26
 
     - name: Apply compliance template
-      ios_config:
-        src: /tmp/{{ inventory_hostname }}_compliance.txt
-      when: ethernet_interfaces | length > 0
-
-    - name: Backup running configuration after applying template
-      ios_command:
-        commands:
-          - show running-config
-      register: post_running_config
-
-    - name: Save post-change running config to file
-      copy:
-        content: "{{ post_running_config.stdout[0] }}"
-        dest: "/tmp/backups/{{ inventory_hostname }}_post_running_config_{{ timestamp }}.txt"
-
-    - name: Compare post-change config with compliance template
-      shell: diff /tmp/backups/{{ inventory_hostname }}_post_running_config_{{ timestamp }}.txt /tmp/{{ inventory_hostname }}_compliance.txt
-      register: diff_output
-      ignore_errors: yes
-
-    - name: Report compliance status
-      debug:
-        msg: "Compliance check for {{ inventory_hostname }}: {{ diff_output.stdout if diff_output.stdout else 'Compliant' }}"
+      template:
+        src: compliance_template.j2
+        dest: /etc/network/configs/compliance.conf
