@@ -1,37 +1,67 @@
 ---
-- name: Apply compliance
-  hosts: routers
+- name: Apply compliance configuration
+  hosts: all
   gather_facts: no
-  connection: network_cli
-
   tasks:
-    - name: Gather interfaces
-      ansible.netcommon.cli_command:
-        command: show ip interface brief
-      register: interfaces_output
 
-    - name: Parse Ethernet interfaces
+    - name: Gather facts
+      ansible.netcommon.network_facts:
+    
+    - name: Ensure ansible_net_interfaces fact is present
+      fail:
+        msg: "The ansible_net_interfaces fact is missing. Please check your network connection and ensure that the device is reachable."
+      when: ansible_net_interfaces is not defined
+
+    - name: Set Ethernet interface fact if present
       set_fact:
-        ethernet_interfaces: "{{ interfaces_output.stdout_lines | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | map(attribute=0) | list }}"
-
+        ethernet_interfaces: "{{ ansible_net_interfaces | selectattr('type', 'match', '^Ethernet$') | map(attribute='name') | list }}"
+    
     - name: Debug parsed interfaces
       debug:
         var: ethernet_interfaces
 
     - name: Configure Ethernet interfaces
-      ios_config:
+      ansible.netcommon.cli_config:
         lines:
-          - description Uplink to core switch
-          - ip address 192.168.100.{{ item_index + 1 }} 255.255.255.0
-          - no shutdown
-        parents: "interface {{ item }}"
+          - "interface {{ item }}"
+          - "description Uplink to core switch"
+          - "ip address 192.168.100.{{ loop.index + 1 }} 255.255.255.0"
+          - "no shutdown"
+        parents: []
       loop: "{{ ethernet_interfaces }}"
-      loop_control:
-        index_var: item_index
-      when: ethernet_interfaces | length > 0
+      ignore_errors: yes
+      register: config_results
+
+    - name: Collect data on configuration attempt
+      debug:
+        var: config_results
+
+    - name: Revert Ethernet interface settings
+      ansible.netcommon.cli_config:
+        lines:
+          - "interface {{ item }}"
+          - "no description"
+          - "no ip address"
+        parents: []
+      loop: "{{ ethernet_interfaces }}"
+      when: config_results is defined and config_results.failed
+      register: revert_results
+
+    - name: Collect data on revert attempt
+      debug:
+        var: revert_results
 
     - name: Apply compliance template
-      template:
+      ansible.builtin.template:
         src: compliance_template.j2
-        dest: /etc/network/configs/compliance.conf
-      when: ethernet_interfaces | length > 0
+        dest: running-config.cfg
+      when: config_results is defined and not config_results.failed
+
+    - name: Collect the final running configuration
+      ansible.netcommon.cli_command:
+        command: show running-config
+      register: running_config
+
+    - name: Display the final running configuration
+      debug:
+        var: running_config.stdout
