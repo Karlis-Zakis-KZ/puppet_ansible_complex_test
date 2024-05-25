@@ -17,11 +17,16 @@ def add_host_key(host):
             text=True,
             check=True
         )
-        with open(os.path.expanduser("~/.ssh/known_hosts"), "a") as known_hosts:
-            known_hosts.write(result.stdout)
-        logging.debug(f"Successfully added host key for {host}")
+        if result.stdout:
+            with open(os.path.expanduser("~/.ssh/known_hosts"), "a") as known_hosts:
+                known_hosts.write(result.stdout)
+            logging.debug(f"Successfully added host key for {host}")
+        else:
+            logging.error(f"No host key found for {host}")
     except subprocess.CalledProcessError as e:
         logging.error(f"Failed to add host key for {host}: {e}")
+        logging.error(f"stdout: {e.stdout}")
+        logging.error(f"stderr: {e.stderr}")
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
     # Ensure the playbook exists
@@ -91,7 +96,7 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    playbook = "apply_compliance.yml"
+    playbook = "collect_facts.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
 
@@ -101,7 +106,7 @@ if __name__ == "__main__":
     
     stats = []
     
-    for i in range(1, 11):  # Run iterations for debugging
+    for i in range(1, 2):  # Run iterations for debugging
         logging.debug(f"Ansible Run {i}")
         stat = run_ansible_playbook(playbook, inventory, i, task_name)
         stats.append(stat)
