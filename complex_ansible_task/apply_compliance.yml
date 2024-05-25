@@ -31,6 +31,8 @@
       template:
         src: compliance_template.j2
         dest: "/tmp/{{ inventory_hostname }}_compliance.txt"
+      vars:
+        ansible_net_interfaces: "{{ facts.ansible_net_interfaces }}"
 
     - name: Apply compliance template
       ios_config:
