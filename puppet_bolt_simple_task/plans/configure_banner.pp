@@ -1,4 +1,4 @@
-plan bolt_module::configure_banner(
+plan puppet_bolt_simple_task::configure_banner(
   TargetSpec $targets
 ) {
   $motd_messages = [
