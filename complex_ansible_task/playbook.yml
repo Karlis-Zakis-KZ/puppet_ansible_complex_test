@@ -3,23 +3,6 @@
   hosts: routers
   gather_facts: no
   tasks:
-    - name: Run ssh-keyscan to get the SSH key
-      delegate_to: localhost
-      shell: "ssh-keyscan -H {{ ansible_host }}"
-      register: ssh_keyscan_output
-      changed_when: false
-
-    - name: Add router SSH keys to known_hosts
-      known_hosts:
-        path: ~/.ssh/known_hosts
-        name: "{{ inventory_hostname }}"
-        key: "{{ ssh_keyscan_output.stdout }}"
-      register: add_key_result
-
-    - name: Debug known_hosts result
-      debug:
-        var: add_key_result
-
     - name: Collect interface facts
       ios_facts:
         gather_subset: interfaces
