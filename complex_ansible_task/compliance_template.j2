@@ -1,0 +1,9 @@
+hostname {{ inventory_hostname }}
+interface GigabitEthernet0/1
+  description Uplink to core switch
+  ip address 192.168.100.1 255.255.255.0
+!
+line vty 0 4
+  exec-timeout 10 0
+  logging synchronous
+!
