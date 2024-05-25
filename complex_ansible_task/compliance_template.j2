@@ -3,7 +3,7 @@ hostname {{ inventory_hostname }}
 {% for iface in ethernet_interfaces %}
 interface {{ iface }}
   description Uplink to core switch
-  ip address 192.168.100.{{ loop.index + 10 }} 255.255.255.0
+  ip address 192.168.100.{{ loop.index + 1 }} 255.255.255.0
 {% endfor %}
 !
 line vty 0 4
