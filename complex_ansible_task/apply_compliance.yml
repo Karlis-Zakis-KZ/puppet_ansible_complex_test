@@ -1,18 +1,23 @@
 ---
 - name: Apply compliance
   hosts: routers
-  gather_facts: yes
+  gather_facts: no
   connection: network_cli
 
   tasks:
-    - name: Ensure ansible_net_interfaces fact is present
-      ansible.netcommon.network_facts:
-        gather_subset: interfaces
+    - name: Gather interfaces
+      ansible.netcommon.cli_command:
+        command: show ip interface brief
+      register: interfaces_output
+
+    - name: Parse interface facts
+      set_fact:
+        ansible_net_interfaces: "{{ ansible_net_interfaces | default({}) | combine({ item[0]: item[1:] }) }}"
+      loop: "{{ interfaces_output.stdout_lines | map('split') | selectattr(0, 'match', '^Ethernet[0-9]') | list }}"
 
     - name: Set Ethernet interface fact if present
       set_fact:
-        ethernet_interfaces: "{{ ansible_net_interfaces.keys() | select('match', '^Ethernet[0-9]') | list }}"
-      when: ansible_net_interfaces is defined
+        ethernet_interfaces: "{{ ansible_net_interfaces.keys() | list }}"
 
     - name: Configure Ethernet interfaces
       ios_config:
