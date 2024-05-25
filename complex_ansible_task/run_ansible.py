@@ -14,6 +14,7 @@ def add_host_key(host, user, password):
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(host, username=user, password=password)
+        client.save_host_keys(os.path.expanduser('~/.ssh/known_hosts'))
         client.close()
         logging.debug(f"Successfully added host key for {host}")
     except Exception as e:
