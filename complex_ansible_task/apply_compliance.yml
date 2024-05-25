@@ -75,7 +75,7 @@
           - no shutdown
         parents: interface {{ item.key }}
       loop: "{{ ethernet_interfaces }}"
-      when: ethernet_interfaces_present
+      when: ethernet_interfaces is defined and ethernet_interfaces_present
 
     - name: Configure FastEthernet interfaces
       ios_config:
@@ -90,4 +90,4 @@
       template:
         src: compliance_template.j2
         dest: /etc/network/configs/compliance.conf
-      when: ethernet_interfaces_present or (inventory_hostname in fastethernet_interfaces)
+      when: ethernet_interfaces is defined or (inventory_hostname in fastethernet_interfaces)
