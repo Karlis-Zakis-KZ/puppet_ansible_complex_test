@@ -21,6 +21,9 @@ def run_bolt_plan(inventory, plan, params=None):
 
     result = subprocess.run(cmd, capture_output=True, text=True)
     
+    logging.debug(f"Raw output from Bolt plan: {result.stdout}")
+    logging.debug(f"Raw error from Bolt plan: {result.stderr}")
+    
     if result.returncode != 0:
         logging.error(f"Bolt plan failed with error: {result.stderr}")
         return None
@@ -42,6 +45,9 @@ def collect_interface_facts(targets):
             "--format", "json"
         ]
         result = subprocess.run(cmd, capture_output=True, text=True)
+
+        logging.debug(f"Raw output from Bolt command on {target}: {result.stdout}")
+        logging.debug(f"Raw error from Bolt command on {target}: {result.stderr}")
 
         if result.returncode != 0:
             logging.error(f"Failed to collect facts for {target} with error: {result.stderr}")
