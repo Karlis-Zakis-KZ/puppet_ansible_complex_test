@@ -90,4 +90,4 @@
       template:
         src: compliance_template.j2
         dest: /etc/network/configs/compliance.conf
-      when: ethernet_interfaces_present
+      when: ethernet_interfaces_present or (inventory_hostname in fastethernet_interfaces)
