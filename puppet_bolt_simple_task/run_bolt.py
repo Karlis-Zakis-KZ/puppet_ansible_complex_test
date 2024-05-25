@@ -57,7 +57,7 @@ def run_bolt_plan(plan, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    plan = "bolt_module::configure_banner"
+    plan = "puppet_bolt_simple_task::configure_banner"
     inventory = "inventory.yaml"
     task_name = "bolt"
 
