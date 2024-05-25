@@ -27,17 +27,25 @@
         content: "{{ running_config.stdout[0] }}"
         dest: "/tmp/backups/{{ inventory_hostname }}_running_config_{{ timestamp }}.txt"
 
+    - name: Set Ethernet interface fact
+      set_fact:
+        ethernet_interfaces: "{{ facts.ansible_net_interfaces | select('search', 'Ethernet') | list }}"
+
+    - name: Check if any Ethernet interfaces are available
+      debug:
+        msg: "Ethernet interfaces found: {{ ethernet_interfaces }}"
+      when: ethernet_interfaces | length > 0
+
     - name: Load compliance template
       template:
         src: compliance_template.j2
         dest: "/tmp/{{ inventory_hostname }}_compliance.txt"
-      vars:
-        ansible_net_interfaces: "{{ facts.ansible_net_interfaces }}"
+      when: ethernet_interfaces | length > 0
 
     - name: Apply compliance template
       ios_config:
         src: /tmp/{{ inventory_hostname }}_compliance.txt
-      when: ansible_net_interfaces is defined and ansible_net_interfaces | length > 0
+      when: ethernet_interfaces | length > 0
 
     - name: Backup running configuration after applying template
       ios_command:
