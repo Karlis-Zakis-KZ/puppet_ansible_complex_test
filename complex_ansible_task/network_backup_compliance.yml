@@ -11,7 +11,7 @@
     - name: Save running config to file
       copy:
         content: "{{ running_config.stdout[0] }}"
-        dest: "/backups/{{ inventory_hostname }}_running_config.txt"
+        dest: "/tmp/backups/{{ inventory_hostname }}_running_config.txt"
 
     - name: Load compliance template
       template:
@@ -19,7 +19,7 @@
         dest: "/tmp/{{ inventory_hostname }}_compliance.txt"
 
     - name: Compare running config with compliance template
-      shell: diff /backups/{{ inventory_hostname }}_running_config.txt /tmp/{{ inventory_hostname }}_compliance.txt
+      shell: diff /tmp/backups/{{ inventory_hostname }}_running_config.txt /tmp/{{ inventory_hostname }}_compliance.txt
       register: diff_output
       ignore_errors: yes
 
