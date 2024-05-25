@@ -6,10 +6,7 @@
       ios_command:
         commands:
           - configure terminal
-          - banner motd $
-          - Attention!
-          - We will be having scheduled system maintenance on this device.
-          - $
+          - banner motd $ Attention! We will be having scheduled system maintenance on this device. $
           - end
       vars:
         ansible_command_timeout: 120
