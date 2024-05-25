@@ -91,8 +91,9 @@ if __name__ == "__main__":
     inventory = "hosts.ini"
     task_name = "ansible"
 
-    # Add host key for the router
-    add_host_key("192.168.21.11", "karlis", "cisco")
+    # Add host keys for all routers
+    for i in range(11, 27):
+        add_host_key(f"192.168.21.{i}", "karlis", "cisco")
     
     stats = []
     
