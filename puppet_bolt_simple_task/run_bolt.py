@@ -17,7 +17,7 @@ def run_bolt_plan(plan, inventory, iteration, task_name):
 
     logging.debug(f"Running Bolt plan {plan} for {task_name} iteration {iteration}")
     result = subprocess.run(
-        ["bolt", "plan", "run", plan, "--targets", "all", "--inventoryfile", inventory],
+        ["bolt", "plan", "run", plan, "--inventoryfile", inventory, "--targets", "all"],
         capture_output=True,
         text=True
     )
@@ -60,13 +60,13 @@ if __name__ == "__main__":
     plan = "bolt_module::configure_banner"
     inventory = "inventory.yaml"
     task_name = "bolt"
-    
+
     stats = []
-    
-    for i in range(1, 11):  # Run a few iterations to test
+
+    for i in range(1, 2):  # Run just one iteration for debugging
         logging.debug(f"Bolt Run {i}")
         stat = run_bolt_plan(plan, inventory, i, task_name)
         stats.append(stat)
-    
+
     logging.debug("Bolt Stats: %s", stats)
     print("Bolt Stats:", stats)
