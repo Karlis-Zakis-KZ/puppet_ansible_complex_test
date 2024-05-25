@@ -8,21 +8,20 @@ import paramiko
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def add_host_key(host, user, password):
-    """Add host key to known_hosts using paramiko with a timeout."""
+def add_host_key(host):
+    """Add host key to known_hosts using ssh-keyscan."""
     try:
-        logging.debug(f"Connecting to {host} to add host key.")
-        client = paramiko.SSHClient()
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(host, username=user, password=password, timeout=10)
-        client.close()
+        result = subprocess.run(
+            ["ssh-keyscan", "-H", host],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        with open(os.path.expanduser("~/.ssh/known_hosts"), "a") as known_hosts:
+            known_hosts.write(result.stdout)
         logging.debug(f"Successfully added host key for {host}")
-    except Exception as e:
+    except subprocess.CalledProcessError as e:
         logging.error(f"Failed to add host key for {host}: {e}")
-
-def add_keys_to_known_hosts():
-    for i in range(11, 27):
-        add_host_key(f"192.168.21.{i}", "karlis", "cisco")
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
     # Ensure the playbook exists
@@ -50,29 +49,12 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     start_time = time.time()
 
     logging.debug(f"Running Ansible playbook {playbook} for {task_name} iteration {iteration}")
-    try:
-        result = subprocess.run(
-            ["ansible-playbook", "-i", inventory, playbook],
-            capture_output=True,
-            text=True,
-            timeout=600,  # Timeout set to 10 minutes
-            env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
-        )
-    except subprocess.TimeoutExpired:
-        logging.error(f"Ansible playbook {playbook} timed out after 10 minutes.")
-        return {
-            "run": iteration,
-            "task": task_name,
-            "duration": 600,
-            "num_packets": 0,
-            "file_size": 0,
-            "data_size": 0,
-            "data_byte_rate": 0,
-            "data_bit_rate": 0,
-            "avg_packet_size": 0,
-            "avg_packet_rate": 0,
-            "error": f"Playbook {playbook} timed out after 10 minutes."
-        }
+    result = subprocess.run(
+        ["ansible-playbook", "-i", inventory, playbook],
+        capture_output=True,
+        text=True,
+        env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
+    )
 
     end_time = time.time()
     duration = end_time - start_time
@@ -109,16 +91,17 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     }
 
 if __name__ == "__main__":
-    playbook = "collect_facts.yml"
+    playbook = "apply_compliance.yml"
     inventory = "hosts.ini"
     task_name = "ansible"
 
-    logging.debug("Adding host keys to known_hosts")
-    add_keys_to_known_hosts()
+    # Add host keys for all routers
+    for i in range(11, 27):
+        add_host_key(f"192.168.21.{i}")
     
     stats = []
     
-    for i in range(1, 11):
+    for i in range(1, 11):  # Run iterations for debugging
         logging.debug(f"Ansible Run {i}")
         stat = run_ansible_playbook(playbook, inventory, i, task_name)
         stats.append(stat)

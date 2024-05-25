@@ -1,13 +1,16 @@
----
 - name: Collect facts from all devices and store as backup
   hosts: all
-  gather_facts: no
   tasks:
+    - name: Ensure SSH key is added to known hosts
+      local_action: shell ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
+      run_once: true
+
     - name: Gather network facts
-      ansible.legacy.ios_facts:
-        gather_subset: all
+      ansible.netcommon.network_cli:
+        provider: "{{ cli }}"
+      register: gather_facts_output
 
     - name: Store facts to a file
-      ansible.builtin.copy:
-        content: "{{ ansible_facts | to_nice_json }}"
-        dest: "/backups/{{ inventory_hostname }}_facts.json"
+      copy:
+        content: "{{ gather_facts_output }}"
+        dest: "/path/to/backup/{{ inventory_hostname }}_facts.json"
