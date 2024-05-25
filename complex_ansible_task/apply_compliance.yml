@@ -21,8 +21,8 @@
       when: ethernet_interfaces is not defined or ethernet_interfaces | length == 0
 
     - name: Configure Ethernet interface Ethernet1/0
-      ansible.netcommon.cli_config:
-        lines:
+      ansible.netcommon.cli_command:
+        commands:
           - interface Ethernet1/0
           - description Uplink to core switch
           - ip address 192.168.100.1 255.255.255.0
@@ -32,8 +32,8 @@
       register: config_results
 
     - name: Revert Ethernet interface Ethernet1/0 settings
-      ansible.netcommon.cli_config:
-        lines:
+      ansible.netcommon.cli_command:
+        commands:
           - interface Ethernet1/0
           - no description
           - no ip address
