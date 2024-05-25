@@ -2,15 +2,9 @@
   hosts: routers
   gather_facts: no
   tasks:
-    - name: Gather current running config
-      ios_command:
-        commands:
-          - show running-config
-      register: running_config
-
-    - name: Ensure ACL configuration is present
-      ios_config:
+    - name: Set login banner
+      cisco.ios.ios_config:
         lines:
-          - permit {{ ip_range }} {{ wildcard_mask }}
-        parents: ip access-list standard {{ acl_name }}
-      when: "'ip access-list standard {{ acl_name }}' not in running_config.stdout[0] or 'permit {{ ip_range }} {{ wildcard_mask }}' not in running_config.stdout[0]"
+          - banner login ^C
+          - Welcome to the router! Unauthorized access is prohibited.^C
+          - ^C
