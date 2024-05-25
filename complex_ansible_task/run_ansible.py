@@ -2,13 +2,11 @@ import subprocess
 import time
 import os
 import logging
-import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def run_ansible_playbook(playbook, inventory, iteration, task_name):
-    # Ensure the playbook exists
     if not os.path.exists(playbook):
         logging.error(f"Playbook {playbook} does not exist.")
         return {
@@ -20,13 +18,11 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
             "error": f"Playbook {playbook} does not exist."
         }
 
-    # Start packet sniffing
     logging.debug(f"Starting packet sniffing for {task_name} iteration {iteration}")
     start_time = time.time()
 
     logging.debug(f"Running Ansible playbook {playbook} for {task_name} iteration {iteration}")
 
-    # Set environment variable to disable SSH host key checking
     env = os.environ.copy()
     env["ANSIBLE_HOST_KEY_CHECKING"] = "False"
 

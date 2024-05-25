@@ -1,14 +1,7 @@
 hostname {{ inventory_hostname }}
 
-{% set eth_interface = None %}
-{% for iface in ansible_net_interfaces %}
-  {% if 'Ethernet' in iface and eth_interface is none %}
-    {% set eth_interface = iface %}
-  {% endif %}
-{% endfor %}
-
-{% if eth_interface %}
-interface {{ eth_interface }}
+{% if ethernet_interfaces %}
+interface {{ ethernet_interfaces[0] }}
   description Uplink to core switch
   ip address 192.168.100.1 255.255.255.0
 {% else %}

@@ -1,6 +1,6 @@
 - name: Apply Compliance Template
   hosts: routers
-  gather_facts: no  # Disable the default facts gathering
+  gather_facts: no
   tasks:
     - name: Gather IOS facts
       ios_facts:
@@ -27,11 +27,15 @@
         content: "{{ running_config.stdout[0] }}"
         dest: "/tmp/backups/{{ inventory_hostname }}_running_config_{{ timestamp }}.txt"
 
+    - name: Debug gathered facts
+      debug:
+        var: facts
+
     - name: Set Ethernet interface fact
       set_fact:
         ethernet_interfaces: "{{ facts.ansible_net_interfaces | select('search', 'Ethernet') | list }}"
 
-    - name: Check if any Ethernet interfaces are available
+    - name: Debug ethernet interfaces
       debug:
         msg: "Ethernet interfaces found: {{ ethernet_interfaces }}"
       when: ethernet_interfaces | length > 0
