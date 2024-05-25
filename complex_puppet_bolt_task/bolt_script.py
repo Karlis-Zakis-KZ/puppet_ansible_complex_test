@@ -109,7 +109,7 @@ def run_plan_and_collect_data(inventory, plan, targets):
 
 if __name__ == "__main__":
     inventory = "inventory.yaml"
-    plan = "configure_routers"
+    plan = "complex_puppet_bolt_task::configure_routers"
     task_name = "puppet_bolt"
 
     # Collect interface facts for all targets

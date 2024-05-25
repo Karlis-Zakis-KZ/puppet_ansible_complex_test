@@ -1,4 +1,4 @@
-plan configure_routers(
+plan complex_puppet_bolt_task::configure_routers(
   TargetSpec $targets,
 ) {
   # Step 1: Collect interface facts
