@@ -22,7 +22,7 @@
       ios_config:
         lines:
           - description Uplink to core switch
-          - ip address 192.168.100.{{ item_index + 1 }} 255.255.255.0
+          - ip address 192.168.100.{{ item_index + 10 }} 255.255.255.0
           - no shutdown
         parents: "interface {{ item }}"
       loop: "{{ ethernet_interfaces }}"
