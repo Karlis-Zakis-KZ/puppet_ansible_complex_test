@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     stats = []
 
-    for i in range(1, 2):  # Run just one iteration for debugging
+    for i in range(1, 11):  # Run just one iteration for debugging
         logging.debug(f"Bolt Run {i}")
         stat = run_bolt_plan(plan, inventory, i, task_name)
         stats.append(stat)
