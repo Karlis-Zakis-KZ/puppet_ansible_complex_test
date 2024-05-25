@@ -8,6 +8,10 @@
         state: directory
         mode: '0755'
 
+    - name: Set timestamp for file names
+      set_fact:
+        timestamp: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+
     - name: Backup running configuration
       ios_command:
         commands:
@@ -17,7 +21,7 @@
     - name: Save running config to file
       copy:
         content: "{{ running_config.stdout[0] }}"
-        dest: "/tmp/backups/{{ inventory_hostname }}_running_config_{{ ansible_date_time.iso8601 }}.txt"
+        dest: "/tmp/backups/{{ inventory_hostname }}_running_config_{{ timestamp }}.txt"
 
     - name: Load compliance template
       template:
@@ -37,10 +41,10 @@
     - name: Save post-change running config to file
       copy:
         content: "{{ post_running_config.stdout[0] }}"
-        dest: "/tmp/backups/{{ inventory_hostname }}_post_running_config_{{ ansible_date_time.iso8601 }}.txt"
+        dest: "/tmp/backups/{{ inventory_hostname }}_post_running_config_{{ timestamp }}.txt"
 
     - name: Compare post-change config with compliance template
-      shell: diff /tmp/backups/{{ inventory_hostname }}_post_running_config_{{ ansible_date_time.iso8601 }}.txt /tmp/{{ inventory_hostname }}_compliance.txt
+      shell: diff /tmp/backups/{{ inventory_hostname }}_post_running_config_{{ timestamp }}.txt /tmp/{{ inventory_hostname }}_compliance.txt
       register: diff_output
       ignore_errors: yes
 

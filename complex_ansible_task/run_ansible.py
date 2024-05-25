@@ -30,9 +30,6 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
     env = os.environ.copy()
     env["ANSIBLE_HOST_KEY_CHECKING"] = "False"
 
-    # Include timestamp in environment variables
-    env["ANSIBLE_DATE_TIME"] = datetime.datetime.now().isoformat()
-
     result = subprocess.run(
         ["ansible-playbook", "-i", inventory, playbook],
         capture_output=True,
