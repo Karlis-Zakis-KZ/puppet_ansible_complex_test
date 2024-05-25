@@ -9,10 +9,8 @@ plan puppet_bolt_simple_task::configure_banner(
     $result = $result_set[0]
     $motd_message = parsejson($result['stdout'])['motd_message']
 
-    # Convert targets to an array and iterate over it
-    $target_array = $targets.to_a
-
-    $target_array.each |$target| {
+    # Directly iterate over the targets
+    $targets.each |$target| {
       out::message("Target object: ${target}")
 
       # Placeholder for the actual commands
