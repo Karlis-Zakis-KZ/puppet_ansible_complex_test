@@ -1,0 +1,49 @@
+- name: Apply Compliance Template
+  hosts: routers
+  gather_facts: no
+  tasks:
+    - name: Ensure the /tmp/backups directory exists
+      file:
+        path: /tmp/backups
+        state: directory
+        mode: '0755'
+
+    - name: Backup running configuration
+      ios_command:
+        commands:
+          - show running-config
+      register: running_config
+
+    - name: Save running config to file
+      copy:
+        content: "{{ running_config.stdout[0] }}"
+        dest: "/tmp/backups/{{ inventory_hostname }}_running_config_{{ ansible_date_time.iso8601 }}.txt"
+
+    - name: Load compliance template
+      template:
+        src: compliance_template.j2
+        dest: "/tmp/{{ inventory_hostname }}_compliance.txt"
+
+    - name: Apply compliance template
+      ios_config:
+        src: /tmp/{{ inventory_hostname }}_compliance.txt
+
+    - name: Backup running configuration after applying template
+      ios_command:
+        commands:
+          - show running-config
+      register: post_running_config
+
+    - name: Save post-change running config to file
+      copy:
+        content: "{{ post_running_config.stdout[0] }}"
+        dest: "/tmp/backups/{{ inventory_hostname }}_post_running_config_{{ ansible_date_time.iso8601 }}.txt"
+
+    - name: Compare post-change config with compliance template
+      shell: diff /tmp/backups/{{ inventory_hostname }}_post_running_config_{{ ansible_date_time.iso8601 }}.txt /tmp/{{ inventory_hostname }}_compliance.txt
+      register: diff_output
+      ignore_errors: yes
+
+    - name: Report compliance status
+      debug:
+        msg: "Compliance check for {{ inventory_hostname }}: {{ diff_output.stdout if diff_output.stdout else 'Compliant' }}"
