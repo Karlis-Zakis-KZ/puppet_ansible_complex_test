@@ -92,7 +92,7 @@ def run_plan_and_collect_data(inventory, plan, targets):
 
         # Stop packet sniffing
         packets = sniffer.stop()
-        pcap_file = f"{task_name}_packets_{i}.pcap"
+        pcap_file = f"puppet_bolt_packets_{i}.pcap"
         wrpcap(pcap_file, packets)
         logging.debug(f"Packet sniffing stopped for run {i}")
 
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     task_name = "puppet_bolt"
 
     # Collect interface facts for all targets
-    targets = ["R1", "R3", "R4"]#, "R6", "R7", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "R16"]
+    targets = ["R1", "R3", "R4"] # add other targets as needed
     facts = collect_interface_facts(targets)
     
     logging.debug(f"Collected interface facts: {facts}")
