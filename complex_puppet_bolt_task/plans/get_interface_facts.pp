@@ -33,9 +33,12 @@ plan complex_puppet_bolt_task::get_interface_facts(
 
       # Update the hash using merge function
       $updated_facts = { $target.uri => $interface_facts }
+      out::message("Facts to merge: ${updated_facts}")
+
+      # Merge the new facts into the all_interface_facts hash
       $all_interface_facts = $all_interface_facts + $updated_facts
 
-      out::message("Updated all_interface_facts: ${all_interface_facts}")
+      out::message("Updated all_interface_facts after merging: ${all_interface_facts}")
     } else {
       out::message("Failed to fetch interface facts for ${$target.uri}.")
     }
