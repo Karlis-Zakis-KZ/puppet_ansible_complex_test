@@ -49,7 +49,8 @@ def collect_interface_facts(targets, timeout=30):
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
             logging.debug(f"Raw output from Bolt command on {target}: {result.stdout}")
-            logging.debug(f"Raw error from Bolt command on {target}: {result.stderr}")
+            if result.stderr:
+                logging.debug(f"Raw error from Bolt command on {target}: {result.stderr}")
 
             if result.returncode != 0:
                 logging.error(f"Failed to collect facts for {target} with error: {result.stderr}")
