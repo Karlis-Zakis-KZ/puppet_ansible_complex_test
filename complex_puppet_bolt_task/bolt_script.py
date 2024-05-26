@@ -79,7 +79,7 @@ def run_plan_and_collect_data(inventory, plan, targets):
         start_time = time.time()
 
         # Run Bolt plan
-        result = run_bolt_plan(inventory, plan, params={"targets": ",".join(targets)})
+        result = run_bolt_plan(inventory, plan, params={"targets": targets})
 
         end_time = time.time()
         duration = end_time - start_time
