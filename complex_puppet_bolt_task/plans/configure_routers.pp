@@ -1,22 +1,27 @@
 plan complex_puppet_bolt_task::configure_routers(
   TargetSpec $targets,
-  String $ethernet_interface = 'Ethernet1/0'
+  Integer $retries = 3,
+  Integer $delay = 5
 ) {
-  # Connect to each target and collect facts
   $results = run_task('complex_puppet_bolt_task::get_interface_facts', $targets)
+  $failures = $results.error_set
 
-  $results.each |$result| {
-    $target = $result['target']
-    $facts = $result['value']['stdout']
+  if $failures {
+    notice("Initial task run failed on ${failures.length} targets. Retrying...")
 
-    # Check if Ethernet1/0 is present
-    if $facts =~ /$ethernet_interface/ {
-      run_task('complex_puppet_bolt_task::configure_interface', $target, interface => $ethernet_interface)
+    $attempt = 1
+    while $attempt <= $retries and $failures {
+      notice("Retry attempt ${attempt}...")
+      sleep($delay)
+      $retry_results = run_task('complex_puppet_bolt_task::get_interface_facts', $failures.target_spec)
+      $failures = $retry_results.error_set
+      $attempt += 1
     }
 
-    # Ensure no configuration on FastEthernet ports
-    $facts.scan(/FastEthernet[0-9]+\/[0-9]+/).each |$fast_interface| {
-      run_task('complex_puppet_bolt_task::clear_interface', $target, interface => $fast_interface)
+    if $failures {
+      fail("Task failed on the following targets even after ${retries} retries: ${failures.target_spec}")
     }
   }
+
+  return $results
 }

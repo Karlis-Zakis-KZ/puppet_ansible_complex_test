@@ -8,7 +8,7 @@ from scapy.all import AsyncSniffer, wrpcap
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def run_bolt_plan(inventory, plan, params=None):
+def run_bolt_plan(inventory, plan, params=None, retries=3, delay=5):
     cmd = [
         "bolt", "plan", "run", plan,
         "--inventory", inventory,
@@ -19,21 +19,27 @@ def run_bolt_plan(inventory, plan, params=None):
         for key, value in params.items():
             cmd.append(f"{key}={value}")
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    
-    logging.debug(f"Raw output from Bolt plan: {result.stdout}")
-    logging.debug(f"Raw error from Bolt plan: {result.stderr}")
-    
-    if result.returncode != 0:
-        logging.error(f"Bolt plan failed with error: {result.stderr}")
-        return None
+    attempt = 0
+    while attempt < retries:
+        result = subprocess.run(cmd, capture_output=True, text=True)
 
-    try:
-        output = json.loads(result.stdout)
-        return output
-    except json.JSONDecodeError as e:
-        logging.error(f"Failed to parse JSON output: {e}")
-        return None
+        logging.debug(f"Raw output from Bolt plan: {result.stdout}")
+        logging.debug(f"Raw error from Bolt plan: {result.stderr}")
+
+        if result.returncode == 0:
+            try:
+                output = json.loads(result.stdout)
+                return output
+            except json.JSONDecodeError as e:
+                logging.error(f"Failed to parse JSON output: {e}")
+                return None
+
+        logging.error(f"Bolt plan failed on attempt {attempt + 1} with error: {result.stderr}")
+        attempt += 1
+        time.sleep(delay)
+
+    logging.error(f"Bolt plan failed after {retries} attempts")
+    return None
 
 def collect_interface_facts(targets, timeout=30):
     facts = {}
