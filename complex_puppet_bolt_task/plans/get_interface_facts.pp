@@ -10,6 +10,9 @@ plan complex_puppet_bolt_task::get_interface_facts(
   # Print the target objects for debugging
   out::message("Target objects: ${target_objects}")
 
+  # Initialize a hash to store the results
+  $all_interface_facts = {}
+
   # Directly iterate over the target objects
   $target_objects.each |$target| {
     out::message("Target object: ${target}")
@@ -27,8 +30,18 @@ plan complex_puppet_bolt_task::get_interface_facts(
 
       # Print the interface facts for debugging
       out::message("Interface facts for ${target}: ${interface_facts}")
+
+      # Store the result in the hash
+      $all_interface_facts[$target.uri] = $interface_facts
     } else {
       out::message("Failed to fetch interface facts for ${target}.")
     }
   }
+
+  # Output the collected interface facts as JSON
+  $json_facts = to_json($all_interface_facts)
+  out::message("All interface facts: ${json_facts}")
+
+  # Return the collected interface facts
+  return $all_interface_facts
 }
