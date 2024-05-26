@@ -1,6 +1,6 @@
 import subprocess
 import time
-from scapy.all import sniff, wrpcap, AsyncSniffer
+from scapy.all import AsyncSniffer, wrpcap
 import os
 import logging
 import paramiko
@@ -101,9 +101,7 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
         "data_byte_rate": data_byte_rate,
         "data_bit_rate": data_bit_rate,
         "avg_packet_size": avg_packet_size,
-        "avg_packet_rate": avg_packet_rate,
-        "stdout": result.stdout,
-        "stderr": result.stderr
+        "avg_packet_rate": avg_packet_rate
     }
 
 if __name__ == "__main__":
