@@ -1,7 +1,9 @@
 import subprocess
+import time
+from scapy.all import sniff, wrpcap, AsyncSniffer
+import os
 import logging
 import paramiko
-import os
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -53,6 +55,13 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
             "error": f"Playbook {playbook} does not exist."
         }
 
+    # Start packet sniffing
+    logging.debug(f"Starting packet sniffing for {task_name} iteration {iteration}")
+    sniffer = AsyncSniffer()
+    sniffer.start()
+
+    start_time = time.time()
+
     logging.debug(f"Running Ansible playbook {playbook} for {task_name} iteration {iteration}")
     result = subprocess.run(
         ["ansible-playbook", "-i", inventory, playbook],
@@ -61,14 +70,40 @@ def run_ansible_playbook(playbook, inventory, iteration, task_name):
         env={**os.environ, "ANSIBLE_CONFIG": os.path.join(os.getcwd(), "ansible.cfg")}
     )
 
+    end_time = time.time()
+    duration = end_time - start_time
+
+    # Stop packet sniffing
+    packets = sniffer.stop()
+    pcap_file = f"{task_name}_packets_{iteration}.pcap"
+    wrpcap(pcap_file, packets)
+    logging.debug(f"Packet sniffing stopped for {task_name} iteration {iteration}")
+
+    num_packets = len(packets)
+    file_size = os.path.getsize(pcap_file) / 1024  # in KB
+    data_size = sum(len(pkt) for pkt in packets) / 1024  # in KB
+    data_byte_rate = data_size / duration if duration > 0 else 0  # in KBps
+    data_bit_rate = data_byte_rate * 8  # in kbps
+    avg_packet_size = (data_size * 1024) / num_packets if num_packets > 0 else 0  # in bytes
+    avg_packet_rate = num_packets / duration if duration > 0 else 0  # in packets/s
+
+    logging.debug(f"Iteration {iteration} completed in {duration:.2f} seconds")
     logging.debug(f"STDOUT: {result.stdout}")
     logging.debug(f"STDERR: {result.stderr}")
 
     return {
         "run": iteration,
         "task": task_name,
-        "duration": result.stdout,
-        "error": result.stderr
+        "duration": duration,
+        "num_packets": num_packets,
+        "file_size": file_size,
+        "data_size": data_size,
+        "data_byte_rate": data_byte_rate,
+        "data_bit_rate": data_bit_rate,
+        "avg_packet_size": avg_packet_size,
+        "avg_packet_rate": avg_packet_rate,
+        "stdout": result.stdout,
+        "stderr": result.stderr
     }
 
 if __name__ == "__main__":
