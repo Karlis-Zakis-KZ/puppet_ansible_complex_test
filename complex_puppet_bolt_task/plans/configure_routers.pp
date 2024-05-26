@@ -20,7 +20,8 @@ plan complex_puppet_bolt_task::configure_routers (
       break
     }
 
-    $retry_results += $failed_targets
+    # Append failed targets to retry_results
+    $retry_results = $retry_results + $failed_targets
 
     if $attempts < $retries {
       # Sleep for a short period before retrying
