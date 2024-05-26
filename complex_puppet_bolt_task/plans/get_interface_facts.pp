@@ -15,7 +15,7 @@ plan complex_puppet_bolt_task::get_interface_facts(
 
   # Directly iterate over the target objects
   $target_objects.each |$target| {
-    out::message("Target object: ${target}")
+    out::message("Target object: ${$target.uri}")
 
     # Command to fetch interface facts
     $command = 'show ip interface brief'
@@ -29,13 +29,15 @@ plan complex_puppet_bolt_task::get_interface_facts(
       $interface_facts = $result['stdout']
 
       # Print the interface facts for debugging
-      out::message("Interface facts for ${target.uri}: ${interface_facts}")
+      out::message("Interface facts for ${$target.uri}: ${interface_facts}")
 
-      # Update the hash using stdlib::merge function
-      $all_interface_facts[$target.uri] = $interface_facts
+      # Update the hash using merge function
+      $updated_facts = { $target.uri => $interface_facts }
+      $all_interface_facts = $all_interface_facts + $updated_facts
+
       out::message("Updated all_interface_facts: ${all_interface_facts}")
     } else {
-      out::message("Failed to fetch interface facts for ${target}.")
+      out::message("Failed to fetch interface facts for ${$target.uri}.")
     }
   }
 
