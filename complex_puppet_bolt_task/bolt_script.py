@@ -35,7 +35,7 @@ def run_bolt_plan(inventory, plan, params=None):
         logging.error(f"Failed to parse JSON output: {e}")
         return None
 
-def collect_interface_facts(targets):
+def collect_interface_facts(targets, timeout=30):
     facts = {}
     for target in targets:
         cmd = [
@@ -44,25 +44,31 @@ def collect_interface_facts(targets):
             "--inventory", "inventory.yaml",
             "--format", "json"
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True)
-
-        logging.debug(f"Raw output from Bolt command on {target}: {result.stdout}")
-        logging.debug(f"Raw error from Bolt command on {target}: {result.stderr}")
-
-        if result.returncode != 0:
-            logging.error(f"Failed to collect facts for {target} with error: {result.stderr}")
-            continue
+        logging.debug(f"Running command: {' '.join(cmd)}")
 
         try:
-            output = json.loads(result.stdout)
-            if 'items' in output and len(output['items']) > 0:
-                facts[target] = output['items'][0]['value']['stdout']
-            else:
-                logging.error(f"Unexpected output format for {target}: 'items' not found or empty")
-        except json.JSONDecodeError as e:
-            logging.error(f"Failed to parse JSON output for {target}: {e}")
-        except KeyError as e:
-            logging.error(f"Unexpected output format for {target}: {e}")
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+
+            logging.debug(f"Raw output from Bolt command on {target}: {result.stdout}")
+            logging.debug(f"Raw error from Bolt command on {target}: {result.stderr}")
+
+            if result.returncode != 0:
+                logging.error(f"Failed to collect facts for {target} with error: {result.stderr}")
+                continue
+
+            try:
+                output = json.loads(result.stdout)
+                if 'items' in output and len(output['items']) > 0:
+                    facts[target] = output['items'][0]['value']['stdout']
+                else:
+                    logging.error(f"Unexpected output format for {target}: 'items' not found or empty")
+            except json.JSONDecodeError as e:
+                logging.error(f"Failed to parse JSON output for {target}: {e}")
+            except KeyError as e:
+                logging.error(f"Unexpected output format for {target}: {e}")
+
+        except subprocess.TimeoutExpired as e:
+            logging.error(f"Command timed out for {target}: {e}")
     
     return facts
 
