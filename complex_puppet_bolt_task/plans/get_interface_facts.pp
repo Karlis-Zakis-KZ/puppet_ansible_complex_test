@@ -31,15 +31,17 @@ plan complex_puppet_bolt_task::get_interface_facts(
       # Print the interface facts for debugging
       out::message("Interface facts for ${target}: ${interface_facts}")
 
-      # Store the result in the hash using merge
-      $all_interface_facts = $all_interface_facts + { $target.uri => $interface_facts }
+      # Update the hash using a with block
+      with($interface_facts, $target) |$interface_facts, $target| {
+        $all_interface_facts = merge($all_interface_facts, { $target.uri => $interface_facts })
+      }
     } else {
       out::message("Failed to fetch interface facts for ${target}.")
     }
   }
 
   # Output the collected interface facts as JSON
-  $json_facts = to_json($all_interface_facts)
+  $json_facts = stdlib::to_json($all_interface_facts)
   out::message("All interface facts: ${json_facts}")
 
   # Return the collected interface facts
