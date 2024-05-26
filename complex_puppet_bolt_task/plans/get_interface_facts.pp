@@ -40,7 +40,7 @@ plan complex_puppet_bolt_task::get_interface_facts(
 
       out::message("Updated all_interface_facts after merging: ${all_interface_facts}")
     } else {
-      out::message("Failed to fetch interface facts for ${$target.uri}.")
+      out::message("Failed to fetch interface facts for ${$target.uri}. Error: ${$result_set.stderr}")
     }
   }
 
