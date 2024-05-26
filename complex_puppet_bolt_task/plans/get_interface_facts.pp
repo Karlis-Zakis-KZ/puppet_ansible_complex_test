@@ -29,10 +29,11 @@ plan complex_puppet_bolt_task::get_interface_facts(
       $interface_facts = $result['stdout']
 
       # Print the interface facts for debugging
-      out::message("Interface facts for ${target}: ${interface_facts}")
+      out::message("Interface facts for ${target.uri}: ${interface_facts}")
 
       # Update the hash using stdlib::merge function
       $all_interface_facts = stdlib::merge($all_interface_facts, { $target.uri => $interface_facts })
+      out::message("Updated all_interface_facts: ${stdlib::to_json($all_interface_facts)}")
     } else {
       out::message("Failed to fetch interface facts for ${target}.")
     }
