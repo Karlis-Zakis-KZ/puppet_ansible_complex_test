@@ -6,7 +6,7 @@ plan complex_puppet_bolt_task::configure_routers (
   $retry_results = []
 
   while $attempts < $retries {
-    $attempts += 1
+    $attempts = $attempts + 1
     $results = run_task('complex_puppet_bolt_task::get_interface_facts', $targets)
 
     # Log results and errors
