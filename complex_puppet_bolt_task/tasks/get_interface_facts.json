@@ -1,6 +1,11 @@
 {
-    "description": "Collect interface facts from a router",
-    "input_method": "environment",
-    "parameters": {}
+    "description": "Get interface facts",
+    "parameters": {},
+    "implementations": [
+      {
+        "name": "get_interface_facts.sh",
+        "requirements": ["shell"]
+      }
+    ]
   }
   

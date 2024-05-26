@@ -1,3 +1,3 @@
 #!/bin/bash
-
-show ip interface brief
+echo "Collecting interface facts"
+ip a
