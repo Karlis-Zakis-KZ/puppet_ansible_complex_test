@@ -99,7 +99,7 @@ if __name__ == "__main__":
     task_name = "ansible"
 
     # Add host keys for all routers
-    for i in range(12, 27):
+    for i in range(12, 15):
         add_host_key(f"192.168.21.{i}", "karlis", "cisco")
     
     stats = []
