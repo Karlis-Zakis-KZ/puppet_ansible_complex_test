@@ -1,7 +1,6 @@
 plan complex_puppet_bolt_task::configure_routers(
   TargetSpec $targets,
-  Integer $retries = 3,
-  Integer $delay = 5
+  Integer $retries = 3
 ) {
   $results = run_task('complex_puppet_bolt_task::get_interface_facts', $targets)
   $failures = $results.error_set
@@ -12,7 +11,6 @@ plan complex_puppet_bolt_task::configure_routers(
     $attempt = 1
     while $attempt <= $retries and $failures {
       notice("Retry attempt ${attempt}...")
-      sleep($delay)
       $retry_results = run_task('complex_puppet_bolt_task::get_interface_facts', $failures.target_spec)
       $failures = $retry_results.error_set
       $attempt += 1
