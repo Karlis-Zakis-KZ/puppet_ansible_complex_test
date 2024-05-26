@@ -1,0 +1,11 @@
+{
+    "description": "Clear the configuration of an interface on a router",
+    "input_method": "environment",
+    "parameters": {
+      "interface": {
+        "description": "The name of the interface to clear",
+        "type": "String"
+      }
+    }
+  }
+  

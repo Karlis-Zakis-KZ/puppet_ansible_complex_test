@@ -1,0 +1,11 @@
+{
+    "description": "Configure an interface on a router",
+    "input_method": "environment",
+    "parameters": {
+      "interface": {
+        "description": "The name of the interface to configure",
+        "type": "String"
+      }
+    }
+  }
+  
